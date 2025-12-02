@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODNet Pet Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-paw"></i> MODNet Pet Studio</h1>
+            <p>Professional AI Pet Matting & Compositing</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('cutout')">
+                <i class="fas fa-cut"></i> Transparent Cutout
+            </button>
+            <button class="tab-btn" onclick="switchTab('compare')">
+                <i class="fas fa-balance-scale"></i> Model Comparison
+            </button>
+            <button class="tab-btn" onclick="switchTab('composite')">
+                <i class="fas fa-images"></i> Background Swap
+            </button>
+        </div>
+
+        <!-- Cutout Mode -->
+        <div id="cutout-panel" class="panel active">
+            <div class="upload-area" id="cutout-dropzone">
+                <input type="file" id="cutout-input" accept="image/*" hidden>
+                <div class="upload-content">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Pet Image</h3>
+                    <p>Drag & drop or click to browse</p>
+                </div>
+                <div class="preview-container" id="cutout-preview-container" style="display: none;">
+                    <img id="cutout-preview-img" src="" alt="Preview">
+                    <button class="remove-btn" onclick="clearCutout()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="model-selector">
+                <label class="model-selector-label">
+                    <i class="fas fa-robot"></i> Select Model:
+                </label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="cutout-model" value="modnet" checked>
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">MODNet</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="cutout-model" value="fba">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">FBA</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="action-btn" id="cutout-btn" disabled onclick="generateCutout()">
+                Generate Cutout
+            </button>
+
+            <div class="result-area" id="cutout-result" style="display: none;">
+                <h3><i class="fas fa-magic"></i> Processing Result</h3>
+
+                <!-- Process Visualization -->
+                <div class="process-viz">
+                    <div class="step">
+                        <span class="step-label">Original</span>
+                        <img id="viz-original" src="" alt="Original">
+                    </div>
+                    <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="step">
+                        <span class="step-label">Alpha Matte</span>
+                        <img id="viz-matte" src="" alt="Matte">
+                    </div>
+                    <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="step">
+                        <span class="step-label">Final Cutout</span>
+                        <img id="viz-cutout" src="" alt="Cutout">
+                    </div>
+                </div>
+
+                <div class="image-wrapper transparent-bg" style="display: none;">
+                    <img id="cutout-result-img" src="" alt="Result">
+                </div>
+
+                <!-- Metrics Panel -->
+                <div class="metrics-panel">
+                    <h4><i class="fas fa-chart-bar"></i> Model Performance</h4>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Confidence</span>
+                            <span class="metric-value" id="metric-confidence">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Benchmark IoU</span>
+                            <span class="metric-value" id="metric-iou">0.8910</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Benchmark Dice</span>
+                            <span class="metric-value" id="metric-dice">0.9401</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Benchmark MAE</span>
+                            <span class="metric-value" id="metric-mae">0.0745</span>
+                        </div>
+                    </div>
+                    <p class="metric-note">* Benchmarks based on Oxford-IIIT Pet Test Set</p>
+                </div>
+
+                <a id="cutout-download" href="#" download="pet_cutout.png" class="download-btn">
+                    <i class="fas fa-download"></i> Download PNG
+                </a>
+            </div>
+        </div>
+
+        <!-- Model Comparison Mode -->
+        <div id="compare-panel" class="panel">
+            <div class="upload-area" id="compare-dropzone">
+                <input type="file" id="compare-input" accept="image/*" hidden>
+                <div class="upload-content">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Pet Image</h3>
+                    <p>Compare MODNet vs FBA Model</p>
+                </div>
+                <div class="preview-container" id="compare-preview-container" style="display: none;">
+                    <img id="compare-preview-img" src="" alt="Preview">
+                    <button class="remove-btn" onclick="clearCompare()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <button class="action-btn" id="compare-btn" disabled onclick="compareModels()">
+                Compare Models
+            </button>
+
+            <div class="result-area" id="compare-result" style="display: none;">
+                <h3><i class="fas fa-balance-scale"></i> Model Comparison</h3>
+
+                <div class="comparison-grid">
+                    <!-- MODNet Results -->
+                    <div class="model-result">
+                        <h4>MODNet</h4>
+                        <div class="image-wrapper transparent-bg">
+                            <img id="modnet-cutout" src="" alt="MODNet">
+                        </div>
+                        <div class="metrics-panel">
+                            <div class="metric-item">
+                                <span class="metric-label">Confidence</span>
+                                <span class="metric-value" id="modnet-confidence">--</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">IoU</span>
+                                <span class="metric-value" id="modnet-iou">0.8910</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Dice</span>
+                                <span class="metric-value" id="modnet-dice">0.9401</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">MAE</span>
+                                <span class="metric-value" id="modnet-mae">0.0745</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FBA Results -->
+                    <div class="model-result">
+                        <h4>FBA Model</h4>
+                        <div class="image-wrapper transparent-bg">
+                            <img id="fba-cutout" src="" alt="FBA">
+                        </div>
+                        <div class="metrics-panel">
+                            <div class="metric-item">
+                                <span class="metric-label">Confidence</span>
+                                <span class="metric-value" id="fba-confidence">--</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">IoU</span>
+                                <span class="metric-value" id="fba-iou">0.85</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Dice</span>
+                                <span class="metric-value" id="fba-dice">0.92</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">MAE</span>
+                                <span class="metric-value" id="fba-mae">0.09</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="winner-banner" id="winner-banner" style="display: none;">
+                    <i class="fas fa-trophy"></i>
+                    <span id="winner-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Composite Mode -->
+        <div id="composite-panel" class="panel">
+            <div class="composite-inputs">
+                <!-- Foreground Input -->
+                <div class="upload-area small" id="fg-dropzone">
+                    <input type="file" id="fg-input" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <i class="fas fa-dog"></i>
+                        <h3>Pet Image</h3>
+                    </div>
+                    <div class="preview-container" id="fg-preview-container" style="display: none;">
+                        <img id="fg-preview-img" src="" alt="Pet">
+                        <button class="remove-btn" onclick="clearComposite('fg')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <div class="plus-icon"><i class="fas fa-plus"></i></div>
+
+                <!-- Background Input -->
+                <div class="upload-area small" id="bg-dropzone">
+                    <input type="file" id="bg-input" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <i class="fas fa-image"></i>
+                        <h3>Background</h3>
+                    </div>
+                    <div class="preview-container" id="bg-preview-container" style="display: none;">
+                        <img id="bg-preview-img" src="" alt="Background">
+                        <button class="remove-btn" onclick="clearComposite('bg')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-selector">
+                <label class="model-selector-label">
+                    <i class="fas fa-robot"></i> Select Model:
+                </label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="composite-model" value="modnet" checked>
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">MODNet</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="composite-model" value="fba">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">FBA</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="action-btn" id="composite-btn" disabled onclick="startCompositeEditor()">
+                Open Editor
+            </button>
+
+            <!-- Interactive Editor -->
+            <div class="editor-area" id="composite-editor" style="display: none;">
+                <h3><i class="fas fa-arrows-alt"></i> Position Your Pet</h3>
+                <p class="editor-instructions">Drag to move • Scroll to resize</p>
+
+                <div class="canvas-container" id="canvas-container">
+                    <img id="editor-bg" src="" alt="Background">
+                    <img id="editor-fg" src="" alt="Pet" draggable="false">
+                </div>
+
+                <div class="editor-controls">
+                    <button class="secondary-btn" onclick="downloadComposite()">
+                        <i class="fas fa-download"></i> Download Composite
+                    </button>
+                    <button class="text-btn" onclick="closeEditor()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loader-overlay" id="loader" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing with AI...</p>
+        </div>
+
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
