@@ -1,0 +1,281 @@
+# Pet Matting & Background Swap Project
+
+A sophisticated deep learning solution for automatically removing backgrounds from pet images with professional-quality results. This project features a web application supporting transparent cutout generation, model comparison, and interactive background swapping.
+
+---
+
+## 🎯 Team Contributions
+
+This is a **2-member collaborative project** with clearly distinct contributions:
+
+### 👨‍💻 Member 1: MODNet Implementation
+- **Focus**: Real-time, lightweight matting optimized for speed and efficiency
+- **Model Architecture**: MODNet (Mobile Optimized Deep Network)
+- **Code Location**: `code/modnet/`
+- **Model Weights**: `models/modnet/modnet_pet_matting.keras`
+- **Benchmark Performance**: IoU 0.8910, Dice 0.9401, MAE 0.0745
+
+### 👨‍💻 Member 2: FBA Matting Implementation
+- **Focus**: High-quality, detail-oriented matting for complex fur and hair edges
+- **Model Architecture**: FBA (Foreground-Background-Alpha) Matting with U-Net segmentation
+- **Code Location**: `code/fba/`
+- **Model Weights**: 
+  - FBA Refinement: `models/fba/fba_pet_final.pth`
+  - U-Net Segmentation: `models/fba/unet/pet_unet_improved_final.keras`
+- **Benchmark Performance**: IoU 0.85, Dice 0.92, MAE 0.09
+
+---
+
+## ✨ Features
+
+1. **🎨 Transparent Cutout Generator**
+   - Upload a pet image and generate a high-quality PNG with transparent background
+   - Choose between MODNet or FBA model
+   - View alpha matte and processing pipeline visualization
+   - Download results instantly
+
+2. **⚖️ Model Comparison**
+   - Side-by-side comparison of MODNet and FBA results
+   - Visual and quantitative performance analysis
+   - Automatic winner determination based on metrics
+
+3. **🖼️ Interactive Background Swap**
+   - Drag-and-drop pet positioning
+   - Scroll to resize foreground
+   - Real-time preview with transparent checkered background
+   - Export high-resolution composites
+
+---
+
+## 📁 Project Structure
+
+```
+final_project_clean/
+├── README.md                    # This file
+├── webapp/                      # Flask web application
+│   ├── app.py                   # Main Flask server and API endpoints
+│   ├── fba_model.py            # FBA pipeline loader and predictor
+│   ├── test_webapp.py          # Testing utilities
+│   ├── templates/
+│   │   └── index.html          # Main UI template
+│   └── static/
+│       ├── style.css           # UI styling
+│       └── script.js           # Frontend logic and interactions
+├── models/                      # Trained model weights
+│   ├── modnet/
+│   │   └── modnet_pet_matting.keras
+│   └── fba/
+│       ├── fba_pet_final.pth
+│       └── unet/
+│           └── pet_unet_improved_final.keras
+├── code/                        # Source code and training scripts
+│   ├── modnet/                  # Member 1's contribution
+│   │   ├── modnet_architecture.py      # MODNet model definition
+│   │   ├── modnet_data_utils.py        # Data preprocessing utilities
+│   │   ├── train_modnet.py             # Main training script
+│   │   ├── train_modnet_quick.py       # Fast training for prototyping
+│   │   ├── evaluation.py               # Model evaluation metrics
+│   │   ├── modnet_inference.py         # Inference utilities
+│   │   ├── pipeline.py                 # End-to-end pipeline
+│   │   ├── simple_pipeline.py          # Simplified inference
+│   │   ├── trimap_generation.py        # Trimap creation utilities
+│   │   ├── generate_cutouts.py         # Batch cutout generation
+│   │   ├── generate_pet_cutout.py      # Single image cutout
+│   │   ├── create_showcase.py          # Create demo visualizations
+│   │   ├── visualize_matting_process.py # Process visualization
+│   │   ├── demo_cutouts.py             # Demo script
+│   │   └── compare_models.py           # Model comparison utilities
+│   └── fba/                     # Member 2's contribution
+│       ├── simple_pipeline.py          # Simplified FBA pipeline
+│       └── FBA_Matting/                # FBA model implementation
+│           ├── __init__.py
+│           ├── dataloader.py           # Data loading utilities
+│           └── networks/               # Neural network architectures
+│               ├── models.py           # FBA model definition
+│               ├── resnet_GN_WS.py     # ResNet with Group Norm
+│               ├── resnet_bn.py        # ResNet with Batch Norm
+│               ├── layers_WS.py        # Weight Standardization layers
+│               └── transforms.py       # Data transformations
+└── data/                        # Sample images (optional)
+```
+
+---
+
+## 📄 File Descriptions
+
+### 🌐 Web Application (`webapp/`)
+
+#### `app.py`
+**Main Flask server** with three API endpoints:
+- `/api/cutout`: Generates transparent cutouts using selected model (MODNet/FBA)
+- `/api/compare`: Side-by-side comparison of both models
+- `/api/composite`: Creates foreground + background composites
+- Handles model loading, image processing, and metric calculation
+
+#### `fba_model.py`
+**FBA Pipeline Integration**:
+- `SimpleFBAPipeline`: Combines U-Net segmentation with FBA refinement
+- `load_fba_pipeline()`: Loads model weights and initializes pipeline
+- `predict_fba_pipeline()`: Runs inference on input images
+- Handles trimap generation and alpha matte refinement
+
+#### `templates/index.html`
+**Main UI Template**:
+- Three-tab interface (Cutout, Compare, Composite)
+- Model selector radio buttons for MODNet/FBA
+- Drag-and-drop file upload zones
+- Interactive composite editor with positioning controls
+- Real-time metrics display
+
+#### `static/script.js`
+**Frontend Logic**:
+- File upload and preview handling
+- API calls to backend (`generateCutout()`, `compareModels()`, `startCompositeEditor()`)
+- Interactive drag-and-drop for composite editor
+- Dynamic metric updates and UI state management
+
+#### `static/style.css`
+**UI Styling**:
+- Modern dark theme with gradient accents
+- Custom radio buttons for model selection
+- Animated transitions and hover effects
+- Responsive design for mobile compatibility
+
+---
+
+### 🧠 MODNet Code (`code/modnet/`)
+
+#### `modnet_architecture.py`
+**MODNet Model Definition**:
+- `MODNet`: MobileNetV2-based encoder-decoder architecture
+- `create_modnet()`: Factory function with customizable parameters
+- Optimized for real-time inference
+
+#### `modnet_data_utils.py`
+**Data Processing**:
+- `prepare_modnet_training_data()`: Prepares Oxford-IIIT Pet dataset
+- `create_training_dataset()`: Applies augmentation and batching
+- Handles segmentation mask preprocessing
+
+#### `train_modnet.py`
+**Main Training Script**:
+- Full training pipeline with callbacks and logging
+- Custom loss functions (BCE + L1 + Gradient Loss)
+- Visualization of training progress
+- Saves model checkpoints and final weights
+
+#### `evaluation.py`
+**Model Evaluation**:
+- IoU, Dice, MAE metric calculations
+- Batch evaluation on test datasets
+- Performance visualization
+
+#### Other MODNet Files:
+- `train_modnet_quick.py`: Fast prototyping training script
+- `modnet_inference.py`: Standalone inference utilities
+- `pipeline.py`: Complete matting pipeline
+- `trimap_generation.py`: Trimap creation from masks
+- `generate_cutouts.py`: Batch processing script
+- `visualize_matting_process.py`: Pipeline visualization
+- `demo_cutouts.py`: Interactive demo
+
+---
+
+### 🔬 FBA Code (`code/fba/`)
+
+#### `simple_pipeline.py`
+**Simplified FBA Pipeline**:
+- Two-stage matting: U-Net → FBA refinement
+- Trimap generation utilities
+- Handles PyTorch model loading and inference
+
+#### `FBA_Matting/networks/models.py`
+**FBA Model Architecture**:
+- `MattingModule`: Main FBA matting network
+- `fba_encoder()`: ResNet-based feature encoder
+- `fba_decoder()`: Pyramid pooling decoder
+- `fba_fusion()`: Foreground-background-alpha fusion
+
+#### Other FBA Files:
+- `networks/resnet_GN_WS.py`: ResNet with Group Normalization and Weight Standardization
+- `networks/layers_WS.py`: Custom weight-standardized layers
+- `dataloader.py`: Data loading utilities for training
+
+---
+
+## 🚀 Setup & Usage
+
+### Prerequisites
+```bash
+pip install tensorflow torch pillow flask numpy scipy
+```
+
+### Running the Application
+
+1. **Navigate to webapp directory**:
+   ```bash
+   cd webapp
+   ```
+
+2. **Start the Flask server**:
+   ```bash
+   python3 app.py
+   ```
+
+3. **Open in browser**:
+   ```
+   http://localhost:4000
+   ```
+
+### Using the Web Interface
+
+#### Transparent Cutout:
+1. Select model (MODNet or FBA)
+2. Upload a pet image
+3. Click "Generate Cutout"
+4. Download the result
+
+#### Model Comparison:
+1. Upload an image
+2. Click "Compare Models"
+3. View side-by-side results
+
+#### Background Swap:
+1. Select model (MODNet or FBA)
+2. Upload pet image and background
+3. Click "Open Editor"
+4. Drag to position, scroll to resize
+5. Download composite
+
+---
+
+## 📊 Model Performance
+
+| Model | IoU | Dice | MAE | Speed |
+|-------|-----|------|-----|-------|
+| **MODNet** | 0.8910 | 0.9401 | 0.0745 | ⚡ Fast |
+| **FBA** | 0.85 | 0.92 | 0.09 | 🎯 Accurate |
+
+*Benchmarks on Oxford-IIIT Pet Test Set*
+
+---
+
+## 🎓 Dataset
+
+Trained on **Oxford-IIIT Pet Dataset**:
+- 37 pet categories
+- ~7,000 images with segmentation masks
+- Diverse backgrounds and poses
+
+---
+
+## 📝 License
+
+This project is for educational purposes.
+
+---
+
+## 👥 Contributors
+
+- **Member 1**: MODNet implementation and training
+- **Member 2**: FBA integration and pipeline development
