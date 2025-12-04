@@ -280,9 +280,9 @@ def compare_models():
                     'alpha_matte': f'data:image/png;base64,{fba_alpha_base64}',
                     'metrics': {
                         'confidence': float(confidence_fba),
-                        'benchmark_iou': 0.7654,
-                        'benchmark_dice': 0.8561,
-                        'benchmark_mae': 0.0774
+                        'benchmark_iou': 0.7037,
+                'benchmark_dice': 0.8174,
+                'benchmark_mae': 0.0899
                     }
                 }
             except Exception as e:

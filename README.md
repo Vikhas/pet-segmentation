@@ -13,7 +13,7 @@ This is a **2-member collaborative project** with clearly distinct contributions
 - **Model Architecture**: MODNet (Mobile Optimized Deep Network)
 - **Code Location**: `code/modnet/`
 - **Model Weights**: `models/modnet/modnet_pet_matting.keras`
-- **Benchmark Performance**: IoU 0.8910, Dice 0.9401, MAE 0.0745
+- **Benchmark Performance**: IoU 0.7237, Dice 0.8290, MAE 0.0807
 
 ### 👨‍💻 Member 2: FBA Matting Implementation
 - **Focus**: High-quality, detail-oriented matting for complex fur and hair edges
@@ -261,7 +261,7 @@ pip install tensorflow torch pillow flask numpy scipy
 
 | Model | IoU | Dice | MAE | Speed |
 |-------|-----|------|-----|-------|
-| **MODNet** | 0.8910 | 0.9401 | 0.0745 | ⚡ Fast |
+| **MODNet** | 0.7237 | 0.8290 | 0.0807 | ⚡ Fast |
 | **FBA** | 0.7500 | 0.8462 | 0.0869 | 🎯 Accurate |
 
 *Benchmarks on Oxford-IIIT Pet Test Set*
