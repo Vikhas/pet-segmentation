@@ -22,7 +22,15 @@ This is a **2-member collaborative project** with clearly distinct contributions
 - **Model Weights**: 
   - FBA Refinement: `models/fba/fba_pet_final.pth`
   - U-Net Segmentation: `models/fba/unet/pet_unet_improved_final.keras`
-- **Benchmark Performance**: IoU 0.85, Dice 0.92, MAE 0.09
+- **Benchmark Performance**: IoU 0.7500, Dice 0.8462, MAE 0.0869
+- **Methodology**:
+  - **Pseudo-Label Generation**: Utilized improved U-Net predictions to generate soft alpha mattes for training.
+  - **Trimap Generation**: Dynamic trimap generation with random unknown region width to handle varying uncertainty.
+  - **FBA Refinement**: Fine-tuned FBA model with ResNet-50 backbone using the generated pseudo-labels.
+- **Novelty**:
+  - **Laplacian Pyramid Loss**: Introduced a multi-scale loss function to capture high-frequency fur details.
+  - **Domain Adaptation**: Fine-tuned a general matting model specifically for pet imagery.
+  - **Self-Training**: Leveraged self-generated pseudo-labels to bridge the gap between coarse masks and soft mattes.
 
 ---
 
@@ -254,7 +262,7 @@ pip install tensorflow torch pillow flask numpy scipy
 | Model | IoU | Dice | MAE | Speed |
 |-------|-----|------|-----|-------|
 | **MODNet** | 0.8910 | 0.9401 | 0.0745 | ⚡ Fast |
-| **FBA** | 0.85 | 0.92 | 0.09 | 🎯 Accurate |
+| **FBA** | 0.7500 | 0.8462 | 0.0869 | 🎯 Accurate |
 
 *Benchmarks on Oxford-IIIT Pet Test Set*
 
