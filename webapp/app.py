@@ -152,16 +152,16 @@ def generate_cutout():
         if selected_model == 'fba':
             alpha_mask = predict_alpha_fba(img)
             benchmark_metrics = {
-                'benchmark_iou': 0.85,
-                'benchmark_dice': 0.92,
-                'benchmark_mae': 0.09
+                'benchmark_iou': 0.7500,
+                'benchmark_dice': 0.8462,
+                'benchmark_mae': 0.0869
             }
         else:  # default to modnet
             alpha_mask = predict_alpha(img)
             benchmark_metrics = {
-                'benchmark_iou': 0.8910,
-                'benchmark_dice': 0.9401,
-                'benchmark_mae': 0.0745
+                'benchmark_iou': 0.7037,
+                'benchmark_dice': 0.8174,
+                'benchmark_mae': 0.0899
             }
         
         # Calculate dynamic metrics (Confidence)
@@ -280,9 +280,9 @@ def compare_models():
                     'alpha_matte': f'data:image/png;base64,{fba_alpha_base64}',
                     'metrics': {
                         'confidence': float(confidence_fba),
-                        'benchmark_iou': 0.85,  # Placeholder - update with actual FBA benchmarks
-                        'benchmark_dice': 0.92,
-                        'benchmark_mae': 0.09
+                        'benchmark_iou': 0.7654,
+                        'benchmark_dice': 0.8561,
+                        'benchmark_mae': 0.0774
                     }
                 }
             except Exception as e:
@@ -297,9 +297,9 @@ def compare_models():
                 'alpha_matte': f'data:image/png;base64,{modnet_alpha_base64}',
                 'metrics': {
                     'confidence': float(confidence_modnet),
-                    'benchmark_iou': 0.8910,
-                    'benchmark_dice': 0.9401,
-                    'benchmark_mae': 0.0745
+                    'benchmark_iou': 0.7237,
+                    'benchmark_dice': 0.8290,
+                    'benchmark_mae': 0.0807
                 }
             },
             'fba': fba_result
