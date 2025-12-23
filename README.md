@@ -8,14 +8,14 @@ A sophisticated deep learning solution for automatically removing backgrounds fr
 
 This is a **2-member collaborative project** with clearly distinct contributions:
 
-### 👨‍💻 Member 1: MODNet Implementation
+### 👨‍💻 Vikhas: MODNet Implementation
 - **Focus**: Real-time, lightweight matting optimized for speed and efficiency
 - **Model Architecture**: MODNet (Mobile Optimized Deep Network)
 - **Code Location**: `code/modnet/`
 - **Model Weights**: `models/modnet/modnet_pet_matting.keras`
 - **Benchmark Performance**: IoU 0.7237, Dice 0.8290, MAE 0.0807
 
-### 👨‍💻 Member 2: FBA Matting Implementation
+### 👨‍💻 Lalitha: FBA Matting Implementation
 - **Focus**: High-quality, detail-oriented matting for complex fur and hair edges
 - **Model Architecture**: FBA (Foreground-Background-Alpha) Matting with U-Net segmentation
 - **Code Location**: `code/fba/`
@@ -52,60 +52,6 @@ This is a **2-member collaborative project** with clearly distinct contributions
    - Scroll to resize foreground
    - Real-time preview with transparent checkered background
    - Export high-resolution composites
-
----
-
-## 📁 Project Structure
-
-```
-final_project_clean/
-├── README.md                    # This file
-├── webapp/                      # Flask web application
-│   ├── app.py                   # Main Flask server and API endpoints
-│   ├── fba_model.py            # FBA pipeline loader and predictor
-│   ├── test_webapp.py          # Testing utilities
-│   ├── templates/
-│   │   └── index.html          # Main UI template
-│   └── static/
-│       ├── style.css           # UI styling
-│       └── script.js           # Frontend logic and interactions
-├── models/                      # Trained model weights
-│   ├── modnet/
-│   │   └── modnet_pet_matting.keras
-│   └── fba/
-│       ├── fba_pet_final.pth
-│       └── unet/
-│           └── pet_unet_improved_final.keras
-├── code/                        # Source code and training scripts
-│   ├── modnet/                  # Member 1's contribution
-│   │   ├── modnet_architecture.py      # MODNet model definition
-│   │   ├── modnet_data_utils.py        # Data preprocessing utilities
-│   │   ├── train_modnet.py             # Main training script
-│   │   ├── train_modnet_quick.py       # Fast training for prototyping
-│   │   ├── evaluation.py               # Model evaluation metrics
-│   │   ├── modnet_inference.py         # Inference utilities
-│   │   ├── pipeline.py                 # End-to-end pipeline
-│   │   ├── simple_pipeline.py          # Simplified inference
-│   │   ├── trimap_generation.py        # Trimap creation utilities
-│   │   ├── generate_cutouts.py         # Batch cutout generation
-│   │   ├── generate_pet_cutout.py      # Single image cutout
-│   │   ├── create_showcase.py          # Create demo visualizations
-│   │   ├── visualize_matting_process.py # Process visualization
-│   │   ├── demo_cutouts.py             # Demo script
-│   │   └── compare_models.py           # Model comparison utilities
-│   └── fba/                     # Member 2's contribution
-│       ├── simple_pipeline.py          # Simplified FBA pipeline
-│       └── FBA_Matting/                # FBA model implementation
-│           ├── __init__.py
-│           ├── dataloader.py           # Data loading utilities
-│           └── networks/               # Neural network architectures
-│               ├── models.py           # FBA model definition
-│               ├── resnet_GN_WS.py     # ResNet with Group Norm
-│               ├── resnet_bn.py        # ResNet with Batch Norm
-│               ├── layers_WS.py        # Weight Standardization layers
-│               └── transforms.py       # Data transformations
-└── data/                        # Sample images (optional)
-```
 
 ---
 
@@ -285,5 +231,5 @@ This project is for educational purposes.
 
 ## 👥 Contributors
 
-- **Member 1**: MODNet implementation and training
-- **Member 2**: FBA integration and pipeline development
+- **Vikhas**: MODNet implementation and training
+- **Lalitha**: FBA integration and pipeline development
